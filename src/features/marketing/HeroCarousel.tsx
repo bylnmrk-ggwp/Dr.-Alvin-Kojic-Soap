@@ -160,7 +160,7 @@ function CarouselArrow({ direction, onClick }: { direction: 'previous' | 'next';
       onClick={onClick}
       aria-label={direction === 'previous' ? 'Previous slide' : 'Next slide'}
       className={cn(
-        'absolute top-1/2 z-10 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-ink/55 text-white shadow-lg backdrop-blur-sm transition-[opacity,background-color,transform] duration-300 hover:bg-ink/80 sm:size-12',
+        'absolute top-1/2 z-10 hidden size-12 -translate-y-1/2 place-items-center rounded-full bg-ink/55 text-white shadow-lg backdrop-blur-sm transition-[opacity,background-color,transform] duration-300 hover:bg-ink/80 sm:grid',
         'opacity-80 group-hover/carousel:opacity-100 focus-visible:opacity-100',
         direction === 'previous' ? 'left-3 sm:left-6' : 'right-3 sm:right-6',
       )}
