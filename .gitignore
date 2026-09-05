@@ -12,3 +12,4 @@ dist-ssr
 .idea
 supabase/.temp
 scripts/.cache
+.playwright-mcp
