@@ -65,3 +65,16 @@ export const communityPhotos: CommunityPhoto[] = [
   { id: 'c7', image: '/community/community-7.webp', alt: 'Dr. Alvin Rejumax banner carried at a town parade.' },
   { id: 'c8', image: '/community/community-8.webp', alt: 'Dr. Alvin distributors on a street parade.' },
 ]
+
+export interface FacebookVideo {
+  /** Full URL of a public Facebook video or reel, e.g. https://www.facebook.com/reel/1234567890 */
+  url: string
+  title: string
+}
+
+/**
+ * Reels and videos from the official Facebook page. Add the URL of any
+ * public reel or video here and it appears in the "Watch us on Facebook"
+ * section on the homepage. Leave empty to hide the section.
+ */
+export const facebookVideos: FacebookVideo[] = []

@@ -9,6 +9,7 @@ import { TrustSection } from '@/features/marketing/TrustSection'
 import { Testimonials } from '@/features/marketing/Testimonials'
 import { DistributorCta } from '@/features/marketing/DistributorCta'
 import { CommunityGallery } from '@/features/marketing/CommunityGallery'
+import { FacebookVideos } from '@/features/marketing/FacebookVideos'
 
 export default function HomePage() {
   return (
@@ -22,6 +23,7 @@ export default function HomePage() {
       <Testimonials />
       <TrustSection />
       <DistributorCta />
+      <FacebookVideos />
       <CommunityGallery />
     </>
   )

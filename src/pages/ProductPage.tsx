@@ -1,15 +1,16 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ShieldCheck, Truck, RotateCcw } from 'lucide-react'
+import { Check, ShieldCheck, Truck, RotateCcw } from 'lucide-react'
 import { PageMeta } from '@/components/common/PageMeta'
 import { SectionHeading } from '@/components/common/SectionHeading'
 import { ActiveTag, Badge, Button, ButtonLink, EmptyState, ProductGallery, Rating, Skeleton } from '@/components/ui'
 import { useProduct, useProducts } from '@/features/catalog/api/catalog.queries'
 import { ProductGrid } from '@/features/catalog/components/ProductGrid'
 import { QuantityStepper } from '@/features/cart/QuantityStepper'
+import { useAddedFlash } from '@/features/cart/useAddedFlash'
 import { useCartStore } from '@/stores/cart.store'
 import { regimenSteps } from '@/data/categories'
-import { formatPrice } from '@/lib/utils'
+import { cn, formatPrice } from '@/lib/utils'
 import { freeShippingThresholdCentavos } from '@/config/site'
 
 export default function ProductPage() {
@@ -18,6 +19,27 @@ export default function ProductPage() {
   const { data: allProducts = [] } = useProducts()
   const add = useCartStore((state) => state.add)
   const [quantity, setQuantity] = useState(1)
+  const [justAdded, flashAdded] = useAddedFlash()
+
+  // On phones a sticky bar takes over once the main add-to-cart control scrolls away.
+  const ctaRef = useRef<HTMLDivElement>(null)
+  const [isCtaVisible, setIsCtaVisible] = useState(true)
+  const productId = product?.id
+
+  useEffect(() => {
+    const element = ctaRef.current
+    if (!element || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver(([entry]) => setIsCtaVisible(entry.isIntersecting), {
+      rootMargin: '-72px 0px 0px 0px',
+    })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [productId])
+
+  useEffect(() => {
+    document.body.classList.toggle('has-sticky-bar', !isCtaVisible && Boolean(productId))
+    return () => document.body.classList.remove('has-sticky-bar')
+  }, [isCtaVisible, productId])
 
   if (isLoading) {
     return (
@@ -132,18 +154,28 @@ export default function ProductPage() {
           </div>
 
           {hasPrice ? (
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <div ref={ctaRef} className="mt-6 flex flex-col gap-3 sm:flex-row">
               <QuantityStepper value={quantity} onChange={setQuantity} label={product.name} className="h-13" />
               <Button
                 size="lg"
-                className="flex-1"
+                className={cn('flex-1', justAdded && 'bg-verified hover:bg-verified')}
                 disabled={!orderable}
                 onClick={() => {
                   add(product, quantity)
+                  flashAdded()
                   setQuantity(1)
                 }}
               >
-                {orderable ? `Add to cart, ${formatPrice(product.priceCentavos * quantity)}` : 'Sold out'}
+                {justAdded ? (
+                  <span className="added-pop inline-flex items-center gap-2">
+                    <Check size={18} strokeWidth={2.5} />
+                    Added to cart
+                  </span>
+                ) : orderable ? (
+                  `Add to cart, ${formatPrice(product.priceCentavos * quantity)}`
+                ) : (
+                  'Sold out'
+                )}
               </Button>
             </div>
           ) : (
@@ -216,6 +248,44 @@ export default function ProductPage() {
           </div>
         </div>
       </article>
+
+      {hasPrice && (
+        <div
+          aria-hidden={isCtaVisible}
+          className={cn(
+            'fixed inset-x-0 bottom-0 z-30 border-t border-rule bg-white/95 px-4 py-3 backdrop-blur transition-transform duration-300 ease-out-quint lg:hidden',
+            isCtaVisible ? 'translate-y-full' : 'translate-y-0',
+          )}
+        >
+          <div className="mx-auto flex max-w-lg items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[0.875rem] font-medium">{product.name}</p>
+              <p className="tabular text-base font-semibold">{formatPrice(product.priceCentavos)}</p>
+            </div>
+            <Button
+              size="md"
+              tabIndex={isCtaVisible ? -1 : 0}
+              className={cn('shrink-0', justAdded && 'bg-verified hover:bg-verified')}
+              disabled={!orderable}
+              onClick={() => {
+                add(product, quantity)
+                flashAdded()
+              }}
+            >
+              {justAdded ? (
+                <span className="added-pop inline-flex items-center gap-1.5">
+                  <Check size={16} strokeWidth={2.5} />
+                  Added
+                </span>
+              ) : orderable ? (
+                'Add to cart'
+              ) : (
+                'Sold out'
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
 
       {related.length > 0 && (
         <section className="shell border-t border-rule py-16 lg:py-20">

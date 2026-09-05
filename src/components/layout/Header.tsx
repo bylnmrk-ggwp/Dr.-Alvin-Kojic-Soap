@@ -20,12 +20,24 @@ export function Header() {
   const lines = useCartStore((state) => state.lines)
   const openDrawer = useCartStore((state) => state.openDrawer)
   const { itemCount } = selectTotals(lines)
+  const previousCount = useRef(itemCount)
+  const [isBouncing, setIsBouncing] = useState(false)
   const { user } = useAuth()
 
   useEffect(() => {
     setOpenMenu(null)
     setIsMobileOpen(false)
   }, [location.pathname, location.search])
+
+  // The bag gives a little hop whenever something new lands in it.
+  useEffect(() => {
+    const grew = itemCount > previousCount.current
+    previousCount.current = itemCount
+    if (!grew) return
+    setIsBouncing(true)
+    const timer = window.setTimeout(() => setIsBouncing(false), 700)
+    return () => window.clearTimeout(timer)
+  }, [itemCount])
 
   useEffect(() => {
     const onScroll = () => setIsStuck(window.scrollY > 8)
@@ -152,7 +164,7 @@ export function Header() {
               className="relative grid size-10 place-items-center rounded-[3px] text-ink-soft transition-colors hover:bg-chalk hover:text-ink"
               aria-label={`Cart, ${itemCount} ${itemCount === 1 ? 'item' : 'items'}`}
             >
-              <ShoppingBag size={19} strokeWidth={1.75} />
+              <ShoppingBag size={19} strokeWidth={1.75} className={cn(isBouncing && 'cart-bounce')} />
               {itemCount > 0 && (
                 <span className="tabular absolute right-1 top-1 grid min-w-[1.05rem] place-items-center rounded-full bg-marigold px-1 text-[0.6875rem] font-semibold leading-[1.05rem] text-white">
                   {itemCount}

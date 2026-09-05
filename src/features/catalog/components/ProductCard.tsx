@@ -1,11 +1,15 @@
 import { Link } from 'react-router-dom'
+import { Check } from 'lucide-react'
 import { ActiveTag, Badge, ProductImage, Rating } from '@/components/ui'
 import { useCartStore } from '@/stores/cart.store'
+import { useAddedFlash } from '@/features/cart/useAddedFlash'
+import { cn } from '@/lib/utils'
 import { formatPrice } from '@/lib/utils'
 import type { Product } from '@/types'
 
 export function ProductCard({ product }: { product: Product }) {
   const add = useCartStore((state) => state.add)
+  const [justAdded, flashAdded] = useAddedFlash()
   const orderable = product.inStock && product.priceCentavos > 0
   const hasPrice = product.priceCentavos > 0
 
@@ -75,10 +79,27 @@ export function ProductCard({ product }: { product: Product }) {
             <button
               type="button"
               disabled={!orderable}
-              onClick={() => add(product)}
-              className="relative z-10 rounded-[3px] border border-ink px-3.5 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-ink hover:text-paper disabled:cursor-not-allowed disabled:border-rule-strong disabled:text-ink-faint disabled:hover:bg-transparent"
+              onClick={() => {
+                add(product)
+                flashAdded()
+              }}
+              className={cn(
+                'relative z-10 min-w-[4.25rem] rounded-[3px] border px-3.5 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:border-rule-strong disabled:text-ink-faint disabled:hover:bg-transparent',
+                justAdded
+                  ? 'border-verified bg-verified text-white'
+                  : 'border-ink text-ink hover:bg-ink hover:text-paper',
+              )}
             >
-              {orderable ? 'Add' : 'Sold out'}
+              {justAdded ? (
+                <span className="added-pop inline-flex items-center gap-1">
+                  <Check size={14} strokeWidth={2.5} />
+                  Added
+                </span>
+              ) : orderable ? (
+                'Add'
+              ) : (
+                'Sold out'
+              )}
             </button>
           ) : (
             <Link

@@ -103,6 +103,34 @@ Variables available in the body: `{{kind}}` (`contact` or `distributor`), `{{fro
 | `VITE_EMAILJS_TEMPLATE_INBOX` | Template ID of *Inbox notification* |
 | `VITE_STORE_EMAIL` | The address that receives inbox mail and order copies. Falls back to `site.email` in `src/config/site.ts`. |
 
+## Ask Dr. Alvin (AI chat)
+
+The floating chat bubble is answered by Claude through a Supabase Edge Function in `supabase/functions/chat`. The Anthropic API key is a Supabase secret and never reaches the browser: the storefront only needs the Supabase URL and anon key it already has.
+
+```bash
+# 1. Put the key in supabase/.env (gitignored) as ANTHROPIC_API_KEY=sk-ant-... then:
+npx supabase secrets set --env-file supabase/.env
+
+# 2. Deploy the function (no Docker needed):
+npx supabase functions deploy chat --no-verify-jwt
+```
+
+The assistant answers from the live catalogue (prices, stock, product pages) plus the policies and FAQ in `supabase/functions/chat/knowledge.ts`. Edit that file and redeploy to change what it knows. `ANTHROPIC_MODEL` can be set as a secret to switch models; the default is `claude-sonnet-5`. Requests are capped per visitor (30 per 10 minutes) and per message (1,500 characters).
+
+If the Anthropic account has no credit the widget shows a friendly error and the rest of the site is unaffected.
+
+## Facebook videos
+
+Add public reel or video URLs to `facebookVideos` in `src/data/homepage.ts`:
+
+```ts
+export const facebookVideos: FacebookVideo[] = [
+  { url: 'https://www.facebook.com/reel/1234567890', title: 'Kojic soap, first week' },
+]
+```
+
+The "Watch us on Facebook" section appears on the homepage as soon as the list has one entry, and each player loads only when it scrolls into view.
+
 ## Scripts
 
 | Command | What it does |

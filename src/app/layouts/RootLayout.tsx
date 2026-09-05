@@ -4,6 +4,8 @@ import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { ScrollToTop } from '@/components/common/ScrollToTop'
 import { CartDrawer } from '@/features/cart/CartDrawer'
+import { ChatWidget } from '@/features/chat/ChatWidget'
+import { BackToTop } from '@/components/common/BackToTop'
 import { Toaster } from '@/components/ui'
 
 export function RootLayout() {
@@ -27,6 +29,8 @@ export function RootLayout() {
 
       <Footer />
       <CartDrawer />
+      <ChatWidget />
+      <BackToTop />
       <Toaster />
     </div>
   )
