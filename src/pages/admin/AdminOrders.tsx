@@ -93,7 +93,7 @@ function OrderRow({ order, onStatusChange }: { order: Order; onStatusChange: (st
       </div>
 
       {open && (
-        <div id={detailsId} className="grid gap-8 border-t border-rule bg-paper p-5 md:grid-cols-2">
+        <div id={detailsId} className="grid grid-cols-1 gap-8 border-t border-rule bg-paper p-5 md:grid-cols-2">
           <div>
             <h3 className="text-sm font-medium text-ink-faint">Items</h3>
             <div className="mt-2">

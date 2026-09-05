@@ -67,9 +67,9 @@ export function Testimonials() {
           </Reveal>
         </div>
 
-        <ul className="mt-16 grid gap-6 md:grid-cols-2 lg:mt-20 lg:grid-cols-3">
+        <ul className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-2 lg:mt-20 lg:grid-cols-3">
           {testimonials.map((item, index) => (
-            <li key={item.id} className="flex">
+            <li key={item.id} className="flex min-w-0">
               <Reveal delay={(index % 3) * 90} className="flex w-full">
                 <figure className="group/card relative flex w-full flex-col rounded-card border border-rule bg-white p-6 transition-[transform,box-shadow,border-color] duration-500 ease-out-quint hover:-translate-y-1.5 hover:border-rule-strong hover:shadow-[0_28px_48px_-28px_rgba(30,26,56,0.35)]">
                   <Quote
