@@ -5,6 +5,16 @@
  */
 export const BRAND = `Dr. Alvin (Dr. Alvin Professional Skin Care Formula) is a Filipino skincare brand formulating since 1998. Products are registered with the FDA Philippines and sold online at dr-alvin.com and through authorised resellers. The store ships nationwide from Quezon City, Metro Manila.`
 
+export const STORE = `
+Main office and pick-up point: #23 F. Bautista St. corner Tolentino St., San Francisco Del Monte, Quezon City, Metro Manila, Philippines. Orders ship from here.
+Office hours: Monday to Saturday, 9:00 am to 6:00 pm (Philippine time). Closed on Sundays and public holidays. Orders placed after 2:00 pm ship the next working day.
+Phone and Viber: 0917 881 5672 (Globe) and 0999 992 1492 (Smart).
+Email: info@dr-alvin.com. Contact form: /contact (reply usually within one working day).
+Website: https://dr-alvin.com. Facebook: https://www.facebook.com/DrAlvinOfficialPage/. Instagram: https://www.instagram.com/dralvinmainpage/.
+Founded in 1998 by Dr. Alvin, starting with a kojic acid soap sold from a clinic in Quezon City. Products are made in the Philippines and registered with the FDA Philippines.
+Authorised resellers and distributors operate nationwide; to find or verify one, or to apply, use /distributor or the contact form.
+`
+
 export const POLICIES = `
 Shipping: free on orders of ₱1,500 and above, otherwise ₱99 flat. Metro Manila 1–2 working days; provincial Luzon 2–4; Visayas and Mindanao 3–6. Orders placed after 2pm ship the next working day. International orders (Singapore, Hong Kong, UAE, United States) go through appointed distributors; customers should use the contact form.
 Payment: cash on delivery nationwide (orders up to ₱5,000), GCash, and bank transfer. Bank details appear on the order confirmation page.

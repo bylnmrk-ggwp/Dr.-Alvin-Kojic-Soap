@@ -70,8 +70,12 @@ export default function ContactPage() {
             </div>
             <div>
               <dt className="font-medium">Phone and Viber</dt>
-              <dd className="mt-1 text-ink-soft">{site.phone}</dd>
-              <dd className="text-[0.8125rem] text-ink-faint">Monday to Saturday, 9am to 6pm</dd>
+              <dd className="mt-1 text-ink-soft">
+                {site.phone} (Globe)
+                <br />
+                {site.phoneAlt} (Smart)
+              </dd>
+              <dd className="text-[0.8125rem] text-ink-faint">{site.hours}</dd>
             </div>
             <div>
               <dt className="font-medium">Office</dt>

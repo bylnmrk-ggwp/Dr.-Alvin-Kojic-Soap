@@ -6,11 +6,14 @@ export const site = {
   description:
     'FDA-registered Filipino skincare, formulated with named actives and priced for everyday use. Rejuvenating sets, brightening soaps, toners and sun protection since 1998.',
   url: 'https://dr-alvin.com',
-  email: 'hello@dr-alvin.com',
-  phone: '+63 917 000 0000',
+  email: 'info@dr-alvin.com',
+  /** Globe line, also on Viber. */
+  phone: '0917 881 5672',
+  phoneAlt: '0999 992 1492',
+  hours: 'Monday to Saturday, 9am to 6pm',
   address: {
-    line1: 'Dr. Alvin Skin Care Center',
-    line2: 'Quezon City, Metro Manila',
+    line1: '#23 F. Bautista St. cor. Tolentino St.',
+    line2: 'San Francisco Del Monte, Quezon City',
     country: 'Philippines',
   },
   social: {

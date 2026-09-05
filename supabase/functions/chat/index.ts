@@ -5,7 +5,7 @@
 //   npx supabase functions deploy chat --no-verify-jwt
 //   npx supabase secrets set GROQ_API_KEY=gsk_...   (or ANTHROPIC_API_KEY=sk-ant-...)
 
-import { BRAND, FAQ, GUARDRAILS, POLICIES, REGIMEN } from './knowledge.ts'
+import { BRAND, FAQ, GUARDRAILS, POLICIES, REGIMEN, STORE } from './knowledge.ts'
 
 const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY') ?? ''
 const GROQ_MODEL = Deno.env.get('GROQ_MODEL') ?? 'openai/gpt-oss-120b'
@@ -238,6 +238,7 @@ Deno.serve(async (request) => {
   const system = [
     GUARDRAILS,
     `About the brand:\n${BRAND}`,
+    `Store location, hours and contact:\n${STORE}`,
     `Store policies:\n${POLICIES}`,
     `The routine:\n${REGIMEN}`,
     `Frequently asked questions:\n${FAQ}`,
