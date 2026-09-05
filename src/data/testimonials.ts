@@ -7,6 +7,10 @@ export interface Testimonial {
   /** Which product the review is actually about. */
   productSlug: string
   yearsUsing: number
+  /** Out of five. */
+  rating: number
+  /** Local photo under /reviews, when the reviewer shared one. */
+  avatar?: string
 }
 
 export const testimonials: Testimonial[] = [
@@ -15,30 +19,36 @@ export const testimonials: Testimonial[] = [
     quote:
       'I used to need a filter for every photo because of the pimple marks on my cheeks. Four months on the rejuvenating set and I stopped reaching for it. The peeling in weeks two and three was real, but it passed.',
     name: 'Joan Torrita',
-    role: 'Customer since 2022',
+    role: 'Skincare user',
     location: 'Cebu City',
     productSlug: 'rejuvenating-set',
     yearsUsing: 3,
+    rating: 5,
+    avatar: '/reviews/reviewer-1.webp',
   },
   {
     id: 't-2',
     quote:
       'My barrier was wrecked from over-exfoliating with another brand. Ceramoist was the only thing that stopped the stinging. Two weeks of just cleanser and cream and I could use actives again.',
     name: 'Sheena Sanchez',
-    role: 'Customer since 2023',
+    role: 'Skincare user',
     location: 'Davao',
     productSlug: 'ceramoist-barrier-repair-cleanser',
     yearsUsing: 2,
+    rating: 5,
+    avatar: '/reviews/reviewer-2.webp',
   },
   {
     id: 't-3',
     quote:
       'Four years selling Dr. Alvin now. The margin is honest and the products actually repeat — customers come back on their own, I do not have to chase anyone. It has paid for my sister to finish school.',
     name: 'Winnie Drou',
-    role: 'Authorised seller since 2021',
+    role: 'Architect and authorised seller',
     location: 'Quezon City',
     productSlug: 'all-in-1-maintenance-set',
     yearsUsing: 4,
+    rating: 5,
+    avatar: '/reviews/reviewer-3.webp',
   },
   {
     id: 't-4',
@@ -49,6 +59,7 @@ export const testimonials: Testimonial[] = [
     location: 'Makati',
     productSlug: 'beautamin-a-tretinoin-0-025',
     yearsUsing: 1,
+    rating: 5,
   },
   {
     id: 't-5',
@@ -59,6 +70,7 @@ export const testimonials: Testimonial[] = [
     location: 'Manila',
     productSlug: 'whitening-sunscreen-cream-gel-spf50',
     yearsUsing: 2,
+    rating: 5,
   },
   {
     id: 't-6',
@@ -69,5 +81,6 @@ export const testimonials: Testimonial[] = [
     location: 'Iloilo',
     productSlug: 'all-in-1-maintenance-set',
     yearsUsing: 4,
+    rating: 5,
   },
 ]

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { SectionHeading } from '@/components/common/SectionHeading'
+import { Reveal } from '@/components/common/Reveal'
 import { communityPhotos } from '@/data/homepage'
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll'
 import { useOnEscape } from '@/hooks/useOnEscape'
@@ -23,14 +24,14 @@ export function CommunityGallery() {
 
   return (
     <section id="community" aria-label="Out in the community" className="border-t border-rule bg-paper py-16 lg:py-20">
-      <div className="shell">
+      <Reveal className="shell">
         <SectionHeading
           title="Out in the community"
           description="Distributor launches, beauty caravans and town parades. Nearly three decades of showing up in person."
         />
-      </div>
+      </Reveal>
 
-      <div className="group/strip relative mt-10">
+      <Reveal delay={120} className="group/strip relative mt-10">
         <ul
           ref={scroller}
           className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] md:px-10 [&::-webkit-scrollbar]:hidden"
@@ -63,7 +64,7 @@ export function CommunityGallery() {
 
         <StripArrow direction="previous" onClick={() => scrollByPage(-1)} />
         <StripArrow direction="next" onClick={() => scrollByPage(1)} />
-      </div>
+      </Reveal>
 
       {openIndex !== null && (
         <Lightbox

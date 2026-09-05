@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useProducts } from '@/features/catalog/api/catalog.queries'
 import { ProductGrid } from '@/features/catalog/components/ProductGrid'
 import { SectionHeading } from '@/components/common/SectionHeading'
+import { Reveal } from '@/components/common/Reveal'
 import type { Product } from '@/types'
 
 /** What the admin has marked as featured, in their order; best sellers if nothing is. */
@@ -20,6 +21,7 @@ export function FeaturedProducts() {
 
   return (
     <section aria-labelledby="featured-heading" className="shell py-20 lg:py-28">
+      <Reveal>
       <SectionHeading
         title="What people reorder"
         description="The products that leave the warehouse most. Between them they cover every step of the routine."
@@ -32,9 +34,10 @@ export function FeaturedProducts() {
           </Link>
         }
       />
-      <div className="mt-12">
+      </Reveal>
+      <Reveal delay={120} className="mt-12">
         <ProductGrid products={featured} isLoading={isLoading} skeletonCount={4} />
-      </div>
+      </Reveal>
     </section>
   )
 }

@@ -143,3 +143,80 @@
 .rise {
   animation: rise 0.7s var(--ease-out-quint) both;
 }
+
+/* ------------------------------------------------------------------
+   Scroll reveals and small delights. Everything here collapses to a
+   plain static layout when the visitor prefers reduced motion.
+   ------------------------------------------------------------------ */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.7s var(--ease-out-quint),
+    transform 0.7s var(--ease-out-quint);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Stars pop in one after another once their section is on screen. */
+.reveal .star-pop {
+  opacity: 0;
+}
+
+.reveal.is-visible .star-pop {
+  animation: star-pop 0.5s var(--ease-out-quint) both;
+}
+
+@keyframes star-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-20deg);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.2) rotate(4deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* A soft ring that breathes behind the play button. */
+.play-pulse::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: var(--color-marigold);
+  opacity: 0.55;
+  animation: play-pulse 2s ease-out infinite;
+  z-index: -1;
+}
+
+@keyframes play-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal .star-pop {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation: none;
+  }
+  .play-pulse::before {
+    animation: none;
+  }
+}
