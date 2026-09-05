@@ -6,6 +6,7 @@ import { PageMeta } from '@/components/common/PageMeta'
 import { Button, Field, Select, TextArea, TextInput } from '@/components/ui'
 import { contactSchema, type ContactValues } from '@/lib/validation/schemas'
 import { submitContactMessage } from '@/features/support/contact.api'
+import { sendInboxNotification } from '@/lib/email/emailjs'
 import { site } from '@/config/site'
 import { toast } from '@/stores/toast.store'
 
@@ -32,6 +33,14 @@ export default function ContactPage() {
   const onSubmit = form.handleSubmit(async (values) => {
     try {
       await submitContactMessage(values)
+      const topicLabel = topics.find((topic) => topic.value === values.topic)?.label ?? values.topic
+      void sendInboxNotification({
+        kind: 'contact',
+        fromName: values.name,
+        fromEmail: values.email,
+        subject: `Contact form from ${values.name}: ${topicLabel}`,
+        message: values.message,
+      })
       setIsSent(true)
     } catch (error) {
       toast.error('Message not sent', error instanceof Error ? error.message : 'Try again in a moment.')

@@ -28,6 +28,46 @@ To regenerate the database types after changing the schema:
 npx supabase gen types typescript --project-id <your-project-id> > src/lib/supabase/database.types.ts
 ```
 
+## Email notifications (EmailJS)
+
+Order confirmations and inbox alerts (contact messages and reseller applications) are sent from the browser through [EmailJS](https://www.emailjs.com). Like Supabase this is optional: without the keys the helpers in `src/lib/email/emailjs.ts` resolve silently and nothing else changes. A failed send is logged with `console.warn` and never blocks the order or message, which has already been saved by then.
+
+1. Create a free EmailJS account and add an **Email Service** (Gmail, Outlook or any SMTP). Note its Service ID.
+2. Under *Email Templates* create the two templates below and note each Template ID.
+3. Fill in the variables in `.env.local` and restart `npm run dev`. Add the same variables under *Settings → Environment Variables* in the Vercel project and redeploy.
+
+### Template: Order confirmation
+
+| Field | Value |
+| --- | --- |
+| To email | `{{to_email}}` |
+| CC | `{{store_email}}` |
+| Subject | `Order {{order_reference}} confirmed` (or anything you like) |
+
+Variables available in the body: `{{to_email}}`, `{{to_name}}`, `{{order_reference}}`, `{{order_date}}`, `{{items_html}}`, `{{items_text}}`, `{{subtotal}}`, `{{shipping}}`, `{{total}}`, `{{payment_method}}`, `{{ship_to}}`, `{{store_email}}`.
+
+`items_html` is a ready-made `<table>` of the order lines (name, size, quantity, line total); write it as `{{{items_html}}}` with triple braces so EmailJS does not escape the markup. `items_text` is the same list as plain lines for a text-only design.
+
+### Template: Inbox notification
+
+| Field | Value |
+| --- | --- |
+| To email | `{{store_email}}` |
+| Reply-To | `{{from_email}}` |
+| Subject | `{{subject}}` |
+
+Variables available in the body: `{{kind}}` (`contact` or `distributor`), `{{from_name}}`, `{{from_email}}`, `{{phone}}`, `{{subject}}`, `{{message}}`, `{{store_email}}`.
+
+### Environment variables
+
+| Variable | Where to find it |
+| --- | --- |
+| `VITE_EMAILJS_PUBLIC_KEY` | *Account → General → Public Key* |
+| `VITE_EMAILJS_SERVICE_ID` | *Email Services*, the service you added |
+| `VITE_EMAILJS_TEMPLATE_ORDER` | Template ID of *Order confirmation* |
+| `VITE_EMAILJS_TEMPLATE_INBOX` | Template ID of *Inbox notification* |
+| `VITE_STORE_EMAIL` | The address that receives inbox mail and order copies. Falls back to `site.email` in `src/config/site.ts`. |
+
 ## Scripts
 
 | Command | What it does |
@@ -71,6 +111,7 @@ dr-alvin-web/
     ├── hooks/                  Generic hooks (scroll lock, escape key)
     ├── lib/
     │   ├── supabase/           Client + generated database types
+    │   ├── email/              EmailJS helpers: order confirmation, inbox alerts
     │   ├── validation/         Zod schemas shared by forms and API
     │   └── utils/              cn, money/date formatting, slugs
     ├── config/                 Site constants, navigation

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { sendOrderConfirmation } from '@/lib/email/emailjs'
 import { fetchMyOrders, fetchOrderByReference, placeOrder } from './orders.api'
 
 export const orderKeys = {
@@ -26,8 +27,9 @@ export function usePlaceOrder() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: placeOrder,
-    onSuccess: () => {
+    onSuccess: (order) => {
       void queryClient.invalidateQueries({ queryKey: orderKeys.all })
+      void sendOrderConfirmation(order)
     },
   })
 }

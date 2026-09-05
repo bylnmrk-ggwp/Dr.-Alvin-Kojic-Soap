@@ -6,7 +6,15 @@ import { Button, ButtonLink, Field, Select, TextArea, TextInput } from '@/compon
 import { distributorSchema, type DistributorValues } from '@/lib/validation/schemas'
 import { submitDistributorApplication } from '@/features/distributor/distributor.api'
 import { useAuth } from '@/features/auth/useAuth'
+import { sendInboxNotification } from '@/lib/email/emailjs'
 import { toast } from '@/stores/toast.store'
+
+const experiences: { value: DistributorValues['sellingExperience']; label: string }[] = [
+  { value: 'none', label: 'No, this would be my first time' },
+  { value: 'online', label: 'Yes, online (Facebook, Shopee, TikTok)' },
+  { value: 'physical-store', label: 'Yes, from a stall or shop' },
+  { value: 'both', label: 'Yes, both online and in person' },
+]
 
 const terms = [
   { heading: 'Starting order', detail: '₱1,500 at wholesale — roughly six maintenance sets or a mixed box of soaps and toners.' },
@@ -32,6 +40,23 @@ export default function DistributorPage() {
   const onSubmit = form.handleSubmit(async (values) => {
     try {
       const result = await submitDistributorApplication(values, user?.id ?? null)
+      const experience = experiences.find((item) => item.value === values.sellingExperience)?.label ?? values.sellingExperience
+      void sendInboxNotification({
+        kind: 'distributor',
+        fromName: values.fullName,
+        fromEmail: values.email,
+        phone: values.phone,
+        subject: `Distributor application from ${values.fullName}, ${values.city}`,
+        message: [
+          `Reference: ${result.reference}`,
+          `Address: ${values.address}`,
+          `City: ${values.city}`,
+          `Province: ${values.province}`,
+          `Selling experience: ${experience}`,
+          '',
+          values.message || 'No additional message.',
+        ].join('\n'),
+      })
       setReference(result.reference)
     } catch (error) {
       toast.error('Application not sent', error instanceof Error ? error.message : 'Try again in a moment.')
@@ -116,10 +141,11 @@ export default function DistributorPage() {
             <Field label="Have you sold skincare before?" required error={form.formState.errors.sellingExperience?.message}>
               {(props) => (
                 <Select {...props} {...form.register('sellingExperience')}>
-                  <option value="none">No, this would be my first time</option>
-                  <option value="online">Yes, online (Facebook, Shopee, TikTok)</option>
-                  <option value="physical-store">Yes, from a stall or shop</option>
-                  <option value="both">Yes, both online and in person</option>
+                  {experiences.map((item) => (
+                    <option key={item.value} value={item.value}>
+                      {item.label}
+                    </option>
+                  ))}
                 </Select>
               )}
             </Field>
