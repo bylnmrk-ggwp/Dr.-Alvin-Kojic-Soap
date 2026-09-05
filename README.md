@@ -105,19 +105,19 @@ Variables available in the body: `{{kind}}` (`contact` or `distributor`), `{{fro
 
 ## Ask Dr. Alvin (AI chat)
 
-The floating chat bubble is answered by Claude through a Supabase Edge Function in `supabase/functions/chat`. The Anthropic API key is a Supabase secret and never reaches the browser: the storefront only needs the Supabase URL and anon key it already has.
+The floating chat bubble is answered by an LLM through a Supabase Edge Function in `supabase/functions/chat`. It uses Groq (`GROQ_API_KEY`, default model `openai/gpt-oss-120b`) when that secret is set, otherwise Anthropic (`ANTHROPIC_API_KEY`). The keys are Supabase secrets and never reach the browser: the storefront only needs the Supabase URL and anon key it already has.
 
 ```bash
-# 1. Put the key in supabase/.env (gitignored) as ANTHROPIC_API_KEY=sk-ant-... then:
+# 1. Put the key in supabase/.env (gitignored) as GROQ_API_KEY=gsk_... (or ANTHROPIC_API_KEY=sk-ant-...) then:
 npx supabase secrets set --env-file supabase/.env
 
 # 2. Deploy the function (no Docker needed):
 npx supabase functions deploy chat --no-verify-jwt
 ```
 
-The assistant answers from the live catalogue (prices, stock, product pages) plus the policies and FAQ in `supabase/functions/chat/knowledge.ts`. Edit that file and redeploy to change what it knows. `ANTHROPIC_MODEL` can be set as a secret to switch models; the default is `claude-sonnet-5`. Requests are capped per visitor (30 per 10 minutes) and per message (1,500 characters).
+The assistant answers from the live catalogue (prices, stock, product pages) plus the policies and FAQ in `supabase/functions/chat/knowledge.ts`. Edit that file and redeploy to change what it knows. `GROQ_MODEL` or `ANTHROPIC_MODEL` can be set as secrets to switch models. Requests are capped per visitor (30 per 10 minutes) and per message (1,500 characters).
 
-If the Anthropic account has no credit the widget shows a friendly error and the rest of the site is unaffected.
+If the provider rejects a request (no credit, rate limit) the widget shows a friendly error and the rest of the site is unaffected.
 
 ## Facebook videos
 
