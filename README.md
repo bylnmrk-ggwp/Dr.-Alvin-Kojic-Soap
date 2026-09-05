@@ -16,16 +16,51 @@ That is enough. Without Supabase credentials the app runs on the local seed cata
 ## Connect Supabase
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. In the SQL editor, run `supabase/migrations/0001_init.sql`, then `supabase/seed.sql`.
-3. Copy `.env.example` to `.env.local` and fill in the Project URL and anon key from *Project Settings → API*.
-4. Restart `npm run dev`.
+2. Sign in and link the project once:
 
-Auth (email + password), persisted orders, the reseller inbox and the contact inbox all switch on automatically. Row-level security is already in the migration: the catalogue is public, users read only their own profile and orders, and both inboxes are insert-only from the client.
+   ```bash
+   npx supabase login
+   npx supabase link --project-ref <your-project-ref>
+   ```
+
+3. Apply the schema and the catalogue:
+
+   ```bash
+   npx supabase db push --include-seed
+   # If the seed did not run (the CLI only reruns it when the file hash changes):
+   npx supabase db query --linked -f supabase/seed.sql
+   ```
+
+4. Copy `.env.example` to `.env.local` and fill in the Project URL and anon key from *Project Settings → API*.
+5. Restart `npm run dev`.
+
+Auth (email + password), persisted orders, the reseller inbox and the contact inbox all switch on automatically. Row-level security is in the migrations: the catalogue is public, customers read only their own profile and orders, both inboxes are insert-only from the client, and orders are created only through the `place_order` database function, which re-prices every line from the catalogue.
 
 To regenerate the database types after changing the schema:
 
 ```bash
-npx supabase gen types typescript --project-id <your-project-id> > src/lib/supabase/database.types.ts
+npx supabase gen types typescript --linked > src/lib/supabase/database.types.ts
+```
+
+## Catalogue
+
+The catalogue is imported from the live dr-alvin.com store. To refresh products, prices and photos:
+
+```bash
+npm run import:catalog          # regenerates src/data/products.ts, supabase/seed.sql, public/products/*.webp
+npx supabase db query --linked -f supabase/seed.sql   # then reseed the database
+```
+
+Photos are converted to WebP at 900px. Products the live store lists without a price show "Price on request" and cannot be added to the cart.
+
+## Admin portal
+
+`/admin` lets the store team choose which products appear on the homepage, toggle best seller and stock flags, edit prices, update order statuses, and read the contact and distributor inboxes.
+
+Access is controlled by the `role` column on `profiles`. Register an account in the app first, then promote it once:
+
+```bash
+npx supabase db query --linked "update public.profiles set role = 'admin' where email = 'you@example.com'"
 ```
 
 ## Email notifications (EmailJS)
