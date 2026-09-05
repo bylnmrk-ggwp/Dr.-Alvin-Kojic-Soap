@@ -1,0 +1,156 @@
+-- Dr. Alvin — seed data
+-- Mirrors src/data/products.ts so the app looks identical with or without Supabase.
+
+insert into public.categories (slug, name, blurb, step, sort_order) values
+  ('cleansers',     'Cleansers',   'Lift the day off without stripping the barrier.',                     'cleanse', 1),
+  ('soaps',         'Soaps',       'The bars that built the brand — kojic, arbutin, glutathione.',        'cleanse', 2),
+  ('toners',        'Toners',      'Rebalance after cleansing and prep skin for actives.',                'tone',    3),
+  ('serums',        'Serums',      'High-concentration actives for a single, specific job.',              'treat',   4),
+  ('creams',        'Creams',      'Seal in moisture and hold the results you have earned.',              'treat',   5),
+  ('sets',          'Sets',        'A full routine in one box, sequenced for you.',                       'treat',   6),
+  ('sun-care',      'Sun care',    'Non-negotiable in tropical sun, especially on actives.',              'protect', 7),
+  ('body-and-hair', 'Body & hair', 'The same formulations, scaled past the face.',                        'protect', 8);
+
+with c as (select id, slug from public.categories)
+insert into public.products
+  (slug, name, summary, description, actives, category_id, step, price_centavos, compare_at_centavos, size_label, how_to_use, skin_concerns, is_best_seller, in_stock, rating_average, rating_count, image_tone)
+values
+  ('all-in-1-maintenance-set', 'All in 1 Maintenance Set',
+   'The complete four-step routine — soap, toner, cream and sunscreen in one box.',
+   'The set most people start with. It sequences the whole Dr. Alvin routine so you are not guessing what goes on first: the Gluta-Kojic bar to cleanse, the maintenance toner to rebalance, the all-in-1 cream to treat, and SPF 50+ to hold the result.',
+   array['Kojic Acid','Glutathione','Niacinamide'], (select id from c where slug='sets'), 'treat', 30000, 37000, '4-piece set',
+   array['Lather the soap, leave it on for 30 seconds, then rinse.','Sweep the toner over damp skin with a cotton pad.','Press a pea-sized amount of cream over the face and neck.','Finish every morning with the sunscreen.'],
+   array['Dark spots','Uneven tone','Sun damage'], true, true, 4.9, 2418, 'marigold'),
+
+  ('gluta-kojic-acid-soap', 'Gluta-Kojic Acid Soap',
+   'The original brightening bar, with glutathione and kojic acid together.',
+   'Kojic acid interrupts pigment as it forms; glutathione supports the skin from the other direction. Expect a slight tingle on the first few washes — that settles as skin adjusts.',
+   array['Kojic Acid','Glutathione'], (select id from c where slug='soaps'), 'cleanse', 9500, null, '135 g bar',
+   array['Work into a lather with water, not directly on skin.','Leave on for 30 seconds, then rinse well.','Use once daily to start, twice once skin adjusts.'],
+   array['Dark spots','Uneven tone'], true, true, 4.8, 3902, 'marigold'),
+
+  ('kojic-acid-soap', 'Kojic Acid Soap',
+   'Single-active bar for anyone building tolerance slowly.',
+   'The same kojic acid concentration without the added glutathione — a simpler starting point if your skin reacts easily.',
+   array['Kojic Acid'], (select id from c where slug='soaps'), 'cleanse', 9000, null, '135 g bar',
+   array['Lather in hands, apply, and leave on for 30 seconds.','Rinse thoroughly and follow with toner.'],
+   array['Dark spots','Uneven tone'], false, true, 4.7, 1544, 'sand'),
+
+  ('alpha-arbutin-soap', 'Alpha Arbutin Soap',
+   'Gentler brightening for sensitive or already-stressed skin.',
+   'Alpha arbutin works on the same pigment pathway as kojic acid but far more quietly, which makes this the bar to reach for if kojic stings.',
+   array['Alpha Arbutin'], (select id from c where slug='soaps'), 'cleanse', 9000, null, '135 g bar',
+   array['Lather, apply, and rinse after 30 seconds.','Safe for twice-daily use.'],
+   array['Dark spots','Sensitivity','Uneven tone'], false, true, 4.7, 986, 'chalk'),
+
+  ('papaya-calamansi-soap', 'Papaya & Calamansi Soap',
+   'Fruit enzymes and vitamin C for a mild, everyday exfoliation.',
+   'Papain from papaya loosens dead surface cells while calamansi contributes vitamin C. The mildest bar in the range.',
+   array['Papain','Vitamin C'], (select id from c where slug='soaps'), 'cleanse', 8500, null, '135 g bar',
+   array['Lather and massage for 20 seconds.','Rinse with lukewarm water.'],
+   array['Uneven tone','Oiliness'], false, true, 4.6, 731, 'leaf'),
+
+  ('ceramoist-barrier-repair-cleanser', 'Ceramoist Barrier Repair Cleanser',
+   'Low-pH ceramide cleanser for skin that has been over-treated.',
+   'If your barrier is compromised — tight, flaky, stinging on application — this is the cleanser to fall back to.',
+   array['Ceramides','Panthenol'], (select id from c where slug='cleansers'), 'cleanse', 25000, null, '150 ml',
+   array['Massage over damp skin for 30 seconds.','Rinse and pat dry — do not rub.','Use morning and night during barrier repair.'],
+   array['Sensitivity','Dryness'], true, true, 4.9, 1207, 'chalk'),
+
+  ('brightening-micellar-cleansing-oil', 'Brightening Micellar Cleansing Oil',
+   'First cleanse — dissolves sunscreen and makeup completely.',
+   'Sunscreen does not come off with a bar of soap alone. This oil emulsifies with water and lifts SPF, makeup and sebum in one pass.',
+   array['Vitamin E','Sunflower Seed Oil'], (select id from c where slug='cleansers'), 'cleanse', 35000, null, '120 ml',
+   array['Apply to dry skin and massage for 30 seconds.','Add water to emulsify, then rinse.','Follow with your usual cleanser.'],
+   array['Oiliness','Acne'], false, true, 4.7, 412, 'violet'),
+
+  ('all-in-1-maintenance-toner', 'All in 1 Maintenance Toner',
+   'Rebalances after cleansing and clears what the soap left behind.',
+   'A light exfoliating toner that keeps pores clear between treatment days.',
+   array['Niacinamide','Witch Hazel'], (select id from c where slug='toners'), 'tone', 17000, null, '120 ml',
+   array['Saturate a cotton pad and sweep over damp skin.','Avoid the eye area.','Let it absorb before the next step.'],
+   array['Oiliness','Acne','Uneven tone'], true, true, 4.8, 2044, 'leaf'),
+
+  ('all-in-1-maintenance-toner-travel', 'All in 1 Maintenance Toner, travel size',
+   'The same toner at 60 ml — for trying it, or for carrying it.',
+   'Identical formulation to the full size.',
+   array['Niacinamide','Witch Hazel'], (select id from c where slug='toners'), 'tone', 11000, null, '60 ml',
+   array['Apply with a cotton pad after cleansing.'],
+   array['Oiliness','Uneven tone'], false, true, 4.7, 508, 'leaf'),
+
+  ('rejuvenating-toner', 'Rejuvenating Toner',
+   'The stronger toner used during an active rejuvenating course.',
+   'Higher acid content than the maintenance toner, intended for the six-to-eight week rejuvenating phase only. Peeling is expected.',
+   array['Glycolic Acid','Salicylic Acid'], (select id from c where slug='toners'), 'tone', 18000, null, '120 ml',
+   array['Start at three nights a week, then build up.','Apply with a cotton pad, avoiding the eye area.','Wear SPF 50+ every single morning.'],
+   array['Dark spots','Acne','Sun damage'], false, true, 4.6, 877, 'violet'),
+
+  ('beautamin-a-tretinoin-0-025', 'Beautamin A 0.025%',
+   'Tretinoin at the starting concentration. Nightly, slowly.',
+   'Tretinoin is the most evidence-backed ingredient in the entire range, and 0.025% is where nearly everyone should begin.',
+   array['Tretinoin 0.025%'], (select id from c where slug='serums'), 'treat', 15000, null, '10 g',
+   array['Apply a pea-sized amount to dry skin at night only.','Begin twice weekly and increase over six weeks.','Never skip morning SPF while using this.','Do not use if pregnant or breastfeeding.'],
+   array['Acne','Fine lines','Uneven tone','Sun damage'], true, true, 4.9, 1663, 'ink'),
+
+  ('beautamin-a-tretinoin-0-05', 'Beautamin A 0.05%',
+   'Double-strength tretinoin, once your skin is fully adjusted.',
+   'Move to 0.05% only after several months at 0.025% with no persistent irritation.',
+   array['Tretinoin 0.05%'], (select id from c where slug='serums'), 'treat', 20000, null, '10 g',
+   array['Nightly on dry skin, a pea-sized amount for the whole face.','Step down to 0.025% if peeling persists past two weeks.','Do not use if pregnant or breastfeeding.'],
+   array['Fine lines','Acne','Sun damage'], false, true, 4.8, 742, 'ink'),
+
+  ('aha-max-megadose-serum', 'AHA MAX Megadose Serum',
+   'A weekly resurfacing dose for texture and stubborn marks.',
+   'High-concentration alpha hydroxy acids in a leave-on serum. Once or twice weekly, never on tretinoin nights.',
+   array['Glycolic Acid','Lactic Acid'], (select id from c where slug='serums'), 'treat', 16000, null, '30 ml',
+   array['Once or twice a week at night, on clean dry skin.','Do not use on the same night as tretinoin.','Rinse off after 10 minutes the first few times.'],
+   array['Uneven tone','Dark spots','Fine lines'], false, true, 4.7, 619, 'violet'),
+
+  ('all-in-1-maintenance-cream', 'All in 1 Maintenance Cream',
+   'The everyday cream that holds results between treatment cycles.',
+   'Light enough for humid weather, with enough niacinamide and arbutin to keep pigment from creeping back.',
+   array['Niacinamide','Alpha Arbutin'], (select id from c where slug='creams'), 'treat', 10000, null, '10 g jar',
+   array['Press a pea-sized amount over face and neck.','Use morning and night after toner.'],
+   array['Dark spots','Uneven tone','Dryness'], true, true, 4.8, 3311, 'marigold'),
+
+  ('ceramoist-barrier-repair-cream', 'Ceramoist Barrier Repair Cream',
+   'Ceramide cream for the weeks your barrier needs rebuilding.',
+   'When actives have gone too far, stop treating and run this twice daily for two weeks.',
+   array['Ceramides','Centella Asiatica'], (select id from c where slug='creams'), 'treat', 10000, null, '10 g jar',
+   array['Apply a thin layer morning and night.','Layer over damp skin for more occlusion.','Safe alongside every other product in the range.'],
+   array['Sensitivity','Dryness'], true, true, 4.9, 1489, 'chalk'),
+
+  ('whitening-sunscreen-cream-gel-spf50', 'Whitening Sunscreen Cream Gel SPF 50+ PA++++',
+   'Daily SPF that does not leave a cast or sit greasy in humidity.',
+   'The single most important product in the range. PA++++ covers the UVA that drives pigment. Gel-textured for tropical weather.',
+   array['SPF 50+','PA++++','Niacinamide'], (select id from c where slug='sun-care'), 'protect', 25000, 29000, '50 ml',
+   array['Apply two finger-lengths as the last morning step.','Reapply every two hours outdoors.','Use year-round, indoors and out.'],
+   array['Sun damage','Dark spots'], true, true, 4.9, 2760, 'marigold'),
+
+  ('beautamin-c-body-wash', 'Beautamin C Body Wash',
+   'Vitamin C wash for underarms, knees and elbows.',
+   'Body skin is thicker and takes longer to respond than the face. Give it eight weeks before judging it.',
+   array['Vitamin C','Glutathione'], (select id from c where slug='body-and-hair'), 'cleanse', 22000, null, '250 ml',
+   array['Lather over damp skin in the shower.','Leave on for a minute on darker areas, then rinse.'],
+   array['Dark spots','Uneven tone'], false, true, 4.6, 588, 'leaf'),
+
+  ('hair-recovery-shampoo-conditioner', 'Hair Recovery Shampoo & Conditioner',
+   'Two-step set for shedding and post-treatment breakage.',
+   'Biotin and caffeine at the root, keratin down the shaft. Bought as a pair because the conditioner is doing half the work.',
+   array['Biotin','Caffeine','Keratin'], (select id from c where slug='body-and-hair'), 'cleanse', 25000, 30000, '2 × 250 ml',
+   array['Shampoo twice, concentrating on the scalp.','Condition the lengths only, and leave for two minutes.'],
+   array['Dryness'], false, false, 4.5, 297, 'ink'),
+
+  ('oil-control-absorbing-film', 'Oil Control Absorbing Film',
+   'Blotting sheets that lift shine without taking sunscreen with them.',
+   'Made for reapplying SPF over a face that has gone shiny by midday. Press, do not rub.',
+   array['Abaca Fibre'], (select id from c where slug='sun-care'), 'protect', 12000, null, '100 sheets',
+   array['Press a sheet against shine for a few seconds.','Reapply sunscreen over the top.'],
+   array['Oiliness'], false, true, 4.4, 203, 'sand'),
+
+  ('rejuvenating-set', 'Rejuvenating Set',
+   'The six-week intensive course, for pigment that has not shifted.',
+   'The strongest routine Dr. Alvin makes, and a commitment rather than a purchase: six to eight weeks of peeling, strict sun avoidance, and no other actives alongside it.',
+   array['Kojic Acid','Glycolic Acid','Tretinoin 0.025%'], (select id from c where slug='sets'), 'treat', 45000, 52000, '5-piece set',
+   array['Read the full regimen guide before the first application.','Follow the numbered order on the box, every night.','SPF 50+ every morning, without exception.','Stop and switch to Ceramoist if skin becomes raw.'],
+   array['Dark spots','Sun damage','Uneven tone','Acne'], true, true, 4.8, 1932, 'violet');

@@ -1,0 +1,145 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------
+   Dr. Alvin — design tokens
+   "Formulary, not spa": clinical paper base, brand violet for
+   wayfinding, marigold spent only on primary action.
+   ------------------------------------------------------------------ */
+@theme {
+  --color-paper: #fbfaf7;
+  --color-paper-sunk: #f4f2ed;
+  --color-chalk: #edeaf6;
+  --color-chalk-deep: #ddd7f0;
+
+  --color-ink: #1e1a38;
+  --color-ink-soft: #4a4468;
+  --color-ink-faint: #7b7596;
+  --color-rule: #e2ded4;
+  --color-rule-strong: #cdc7bb;
+
+  --color-violet: #4b2ed4;
+  --color-violet-deep: #3a20ad;
+  --color-violet-wash: #f0ecfd;
+
+  --color-marigold: #ff7a00;
+  --color-marigold-deep: #e06400;
+  --color-marigold-wash: #fff2e4;
+
+  --color-verified: #0f6b4f;
+  --color-verified-wash: #e7f3ee;
+  --color-alert: #b3261e;
+
+  --font-sans: 'Familjen Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Newsreader', ui-serif, Georgia, serif;
+
+  --text-display: 4.25rem;
+  --text-display--line-height: 0.94;
+  --text-display--letter-spacing: -0.035em;
+  --text-title: 2.75rem;
+  --text-title--line-height: 1.02;
+  --text-title--letter-spacing: -0.028em;
+  --text-heading: 1.75rem;
+  --text-heading--line-height: 1.12;
+  --text-heading--letter-spacing: -0.02em;
+
+  --radius-card: 4px;
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: 'ss01', 'cv01';
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  /* Prices, quantities and percentages line up in columns. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-violet);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--color-violet);
+    color: #fff;
+  }
+}
+
+@layer components {
+  /* The page gutter, shared by every section so nothing drifts. */
+  .shell {
+    width: 100%;
+    max-width: 78rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .shell {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  /* Prose blocks read in the serif at a comfortable measure. */
+  .prose-reading {
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: var(--color-ink-soft);
+    max-width: 62ch;
+  }
+
+  .prose-reading p + p {
+    margin-top: 1.15em;
+  }
+}
+
+/* One orchestrated page-load reveal on the home hero — not per section. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 0.7s var(--ease-out-quint) both;
+}

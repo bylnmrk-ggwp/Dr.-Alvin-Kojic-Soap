@@ -35,7 +35,7 @@ npx supabase gen types typescript --project-id <your-project-id> > src/lib/supab
 | `npm run dev` | Dev server with HMR |
 | `npm run build` | Type-check and build to `dist/` |
 | `npm run preview` | Serve the production build locally |
-| `npm run lint` | ESLint |
+| `npm run lint` | Lint with oxlint |
 
 ## Folder structure
 
@@ -68,7 +68,7 @@ dr-alvin-web/
     │   ├── layout/             Header, Footer, MobileNav, SearchOverlay, Logo
     │   └── common/             PageMeta, SectionHeading, ScrollToTop
     ├── stores/                 Zustand: cart (persisted), toasts
-    ├── hooks/                  Generic hooks (media query, scroll lock, escape, debounce)
+    ├── hooks/                  Generic hooks (scroll lock, escape key)
     ├── lib/
     │   ├── supabase/           Client + generated database types
     │   ├── validation/         Zod schemas shared by forms and API
