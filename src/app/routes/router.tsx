@@ -1,6 +1,7 @@
 import { lazy } from 'react'
-import { createBrowserRouter } from 'react-router-dom'
+import { Navigate, createBrowserRouter } from 'react-router-dom'
 import { RootLayout } from '@/app/layouts/RootLayout'
+import { AdminRoute } from './AdminRoute'
 import { ProtectedRoute } from './ProtectedRoute'
 import { RouteErrorBoundary } from './RouteErrorBoundary'
 
@@ -20,6 +21,10 @@ const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'))
 const AccountPage = lazy(() => import('@/pages/account/AccountPage'))
 const AccountOverview = lazy(() => import('@/pages/account/AccountOverview'))
 const AccountOrders = lazy(() => import('@/pages/account/AccountOrders'))
+const AdminLayout = lazy(() => import('@/pages/admin/AdminLayout'))
+const AdminProducts = lazy(() => import('@/pages/admin/AdminProducts'))
+const AdminOrders = lazy(() => import('@/pages/admin/AdminOrders'))
+const AdminInbox = lazy(() => import('@/pages/admin/AdminInbox'))
 const LegalPage = lazy(() => import('@/pages/LegalPage'))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
 
@@ -52,6 +57,21 @@ export const router = createBrowserRouter([
             children: [
               { index: true, element: <AccountOverview /> },
               { path: 'orders', element: <AccountOrders /> },
+            ],
+          },
+        ],
+      },
+      {
+        element: <AdminRoute />,
+        children: [
+          {
+            path: 'admin',
+            element: <AdminLayout />,
+            children: [
+              { index: true, element: <Navigate to="/admin/products" replace /> },
+              { path: 'products', element: <AdminProducts /> },
+              { path: 'orders', element: <AdminOrders /> },
+              { path: 'inbox', element: <AdminInbox /> },
             ],
           },
         ],

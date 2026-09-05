@@ -29,7 +29,12 @@ export default function AccountPage() {
               </p>
             )}
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
+            {profile?.role === 'admin' && (
+              <Link to="/admin" className="inline-flex h-11 items-center text-[0.9375rem] font-medium text-violet underline decoration-violet/30 underline-offset-4 hover:decoration-violet">
+                Store admin
+              </Link>
+            )}
             {!profile?.isDistributor && (
               <Link to="/distributor" className="inline-flex h-11 items-center text-[0.9375rem] font-medium text-violet underline decoration-violet/30 underline-offset-4 hover:decoration-violet">
                 Become a seller
