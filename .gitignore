@@ -13,3 +13,6 @@ dist-ssr
 supabase/.temp
 scripts/.cache
 .playwright-mcp
+
+.vercel
+.env*
