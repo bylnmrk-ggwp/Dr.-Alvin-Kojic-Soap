@@ -6,7 +6,7 @@ import { useProducts } from '@/features/catalog/api/catalog.queries'
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll'
 import { useOnEscape } from '@/hooks/useOnEscape'
 import { formatPrice } from '@/lib/utils'
-import { ProductVisual } from '@/components/ui'
+import { ProductImage } from '@/components/ui'
 
 export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [term, setTerm] = useState('')
@@ -104,8 +104,8 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
                   }}
                   className="flex w-full items-center gap-3.5 px-4 py-2.5 text-left transition-colors hover:bg-chalk"
                 >
-                  <div className="size-12 shrink-0 overflow-hidden">
-                    <ProductVisual tone={product.imageTone} categorySlug={product.categorySlug} />
+                  <div className="size-12 shrink-0 overflow-hidden rounded-card border border-rule">
+                    <ProductImage src={product.images[0]} alt="" tone={product.imageTone} categorySlug={product.categorySlug} sizes="48px" className="size-full" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-[0.9375rem] font-medium text-ink">{product.name}</p>
