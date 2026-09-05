@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { ShieldCheck, Truck, RotateCcw } from 'lucide-react'
 import { PageMeta } from '@/components/common/PageMeta'
 import { SectionHeading } from '@/components/common/SectionHeading'
-import { ActiveTag, Badge, Button, ButtonLink, EmptyState, ProductVisual, Rating, Skeleton } from '@/components/ui'
+import { ActiveTag, Badge, Button, ButtonLink, EmptyState, ProductGallery, Rating, Skeleton } from '@/components/ui'
 import { useProduct, useProducts } from '@/features/catalog/api/catalog.queries'
 import { ProductGrid } from '@/features/catalog/components/ProductGrid'
 import { QuantityStepper } from '@/features/cart/QuantityStepper'
@@ -46,6 +46,8 @@ export default function ProductPage() {
   }
 
   const step = regimenSteps.find((item) => item.step === product.step)
+  const hasPrice = product.priceCentavos > 0
+  const orderable = product.inStock && hasPrice
   const related = allProducts
     .filter((item) => item.id !== product.id && (item.step === product.step || item.categorySlug === product.categorySlug))
     .slice(0, 4)
@@ -76,13 +78,12 @@ export default function ProductPage() {
 
       <article className="shell grid gap-12 py-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:py-12">
         <div className="lg:sticky lg:top-24 lg:self-start">
-          <div className="aspect-square overflow-hidden bg-chalk">
-            <ProductVisual
-              tone={product.imageTone}
-              categorySlug={product.categorySlug}
-              initials={product.name.slice(0, 2)}
-            />
-          </div>
+          <ProductGallery
+            images={product.images}
+            name={product.name}
+            tone={product.imageTone}
+            categorySlug={product.categorySlug}
+          />
         </div>
 
         <div>
@@ -95,7 +96,7 @@ export default function ProductPage() {
               </Link>
             )}
             {product.isBestSeller && <Badge tone="muted">Best seller</Badge>}
-            {!product.inStock && <Badge tone="neutral">Back in stock soon</Badge>}
+            {!product.inStock && <Badge tone="neutral">{hasPrice ? 'Back in stock soon' : 'Ask about availability'}</Badge>}
           </div>
 
           <h1 className="mt-4 text-[clamp(2rem,4vw,2.75rem)] font-semibold leading-[1.04] tracking-[-0.028em]">
@@ -104,9 +105,11 @@ export default function ProductPage() {
 
           <p className="prose-reading mt-4 text-[1.125rem]">{product.summary}</p>
 
-          <div className="mt-5">
-            <Rating value={product.ratingAverage} count={product.ratingCount} size="md" />
-          </div>
+          {product.ratingCount > 0 && (
+            <div className="mt-5">
+              <Rating value={product.ratingAverage} count={product.ratingCount} size="md" />
+            </div>
+          )}
 
           <div className="mt-6 flex flex-wrap gap-2">
             {product.actives.map((active) => (
@@ -117,31 +120,39 @@ export default function ProductPage() {
           <div className="mt-8 flex items-end justify-between gap-6 border-t border-rule pt-6">
             <div>
               <p className="tabular text-[2rem] font-semibold leading-none tracking-tight">
-                {formatPrice(product.priceCentavos)}
+                {hasPrice ? formatPrice(product.priceCentavos) : <span className="text-[1.375rem] text-ink-soft">Price on request</span>}
                 {product.compareAtCentavos && (
                   <span className="ml-3 text-lg font-normal text-ink-faint line-through">
                     {formatPrice(product.compareAtCentavos)}
                   </span>
                 )}
               </p>
-              <p className="mt-2 text-sm text-ink-faint">{product.sizeLabel}</p>
+              {product.sizeLabel && <p className="mt-2 text-sm text-ink-faint">{product.sizeLabel}</p>}
             </div>
           </div>
 
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <QuantityStepper value={quantity} onChange={setQuantity} label={product.name} className="h-13" />
-            <Button
-              size="lg"
-              className="flex-1"
-              disabled={!product.inStock}
-              onClick={() => {
-                add(product, quantity)
-                setQuantity(1)
-              }}
-            >
-              {product.inStock ? `Add to cart, ${formatPrice(product.priceCentavos * quantity)}` : 'Sold out'}
-            </Button>
-          </div>
+          {hasPrice ? (
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <QuantityStepper value={quantity} onChange={setQuantity} label={product.name} className="h-13" />
+              <Button
+                size="lg"
+                className="flex-1"
+                disabled={!orderable}
+                onClick={() => {
+                  add(product, quantity)
+                  setQuantity(1)
+                }}
+              >
+                {orderable ? `Add to cart, ${formatPrice(product.priceCentavos * quantity)}` : 'Sold out'}
+              </Button>
+            </div>
+          ) : (
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <ButtonLink to="/contact" size="lg" className="flex-1">
+                Ask about this product
+              </ButtonLink>
+            </div>
+          )}
 
           <ul className="mt-6 grid gap-2.5 text-sm text-ink-soft">
             <li className="flex items-center gap-2.5">
@@ -161,9 +172,16 @@ export default function ProductPage() {
           <div className="mt-10 grid gap-8 border-t border-rule pt-8">
             <section>
               <h2 className="text-heading">About this product</h2>
-              <p className="prose-reading mt-3">{product.description}</p>
+              <div className="mt-3 grid gap-3">
+                {product.description.split(/\n\n+/).map((paragraph) => (
+                  <p key={paragraph} className="prose-reading">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
             </section>
 
+            {product.howToUse.length > 0 && (
             <section>
               <h2 className="text-heading">How to use it</h2>
               <ol className="mt-4 grid gap-3">
@@ -177,7 +195,9 @@ export default function ProductPage() {
                 ))}
               </ol>
             </section>
+            )}
 
+            {product.skinConcerns.length > 0 && (
             <section>
               <h2 className="text-heading">Good for</h2>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -192,6 +212,7 @@ export default function ProductPage() {
                 ))}
               </div>
             </section>
+            )}
           </div>
         </div>
       </article>

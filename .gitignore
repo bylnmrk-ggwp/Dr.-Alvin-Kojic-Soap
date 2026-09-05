@@ -11,3 +11,4 @@ dist-ssr
 !.vscode/extensions.json
 .idea
 supabase/.temp
+scripts/.cache

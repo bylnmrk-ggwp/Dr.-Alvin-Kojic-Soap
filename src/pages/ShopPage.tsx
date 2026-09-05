@@ -23,7 +23,7 @@ export default function ShopPage() {
   const description =
     activeCategory?.blurb ??
     activeStep?.description ??
-    'Twenty products across four steps. Filter by where it sits in your routine, what it is, or what you are trying to fix.'
+    `${isLoading ? 'The full range' : `${products.length} products`} across four steps. Filter by where it sits in your routine, what it is, or what you are trying to fix.`
 
   const filterPanel = (
     <CatalogFilters

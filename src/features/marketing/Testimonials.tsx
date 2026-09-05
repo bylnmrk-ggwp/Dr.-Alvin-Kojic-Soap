@@ -7,7 +7,7 @@ export function Testimonials() {
     <section aria-labelledby="reviews-heading" className="border-y border-rule bg-paper-sunk">
       <div className="shell py-20 lg:py-28">
         <SectionHeading
-          title="Twenty-four thousand reviews, and the same three themes."
+          title="What customers keep telling us."
           description="People come for the price, stay for the results, and a good number end up selling it themselves. These are unedited, including the parts about peeling."
         />
 

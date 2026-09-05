@@ -44,6 +44,7 @@ export const useCartStore = create<CartState>()(
                   unitPriceCentavos: product.priceCentavos,
                   quantity: Math.min(quantity, MAX_PER_LINE),
                   imageTone: product.imageTone,
+                  image: product.images[0] ?? null,
                 },
               ]
           return { lines, isDrawerOpen: true, lastAddedId: product.id }

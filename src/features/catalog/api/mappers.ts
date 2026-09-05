@@ -33,5 +33,8 @@ export function toProduct(row: ProductRow, categorySlugById: Map<string, string>
     ratingAverage: Number(row.rating_average),
     ratingCount: row.rating_count,
     imageTone: row.image_tone,
+    images: row.images ?? [],
+    isFeatured: row.is_featured,
+    featuredOrder: row.featured_order,
   }
 }

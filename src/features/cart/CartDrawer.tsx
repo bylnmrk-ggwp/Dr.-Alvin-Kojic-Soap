@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { Trash2 } from 'lucide-react'
-import { Button, ButtonLink, Drawer, ProductVisual } from '@/components/ui'
+import { Button, ButtonLink, Drawer, ProductImage } from '@/components/ui'
 import { useCartStore, selectTotals } from '@/stores/cart.store'
 import { useProducts } from '@/features/catalog/api/catalog.queries'
 import { formatPrice, pluralise } from '@/lib/utils'
@@ -13,7 +13,7 @@ export function CartDrawer() {
   const totals = selectTotals(lines)
   const { data: products = [] } = useProducts()
 
-  const categoryByProductId = new Map(products.map((product) => [product.id, product.categorySlug]))
+  const productById = new Map(products.map((product) => [product.id, product]))
   const remainingForFreeShipping = freeShippingThresholdCentavos - totals.subtotalCentavos
 
   return (
@@ -78,11 +78,15 @@ export function CartDrawer() {
               <Link
                 to={`/product/${line.slug}`}
                 onClick={closeDrawer}
-                className="size-20 shrink-0 overflow-hidden"
+                className="size-20 shrink-0 overflow-hidden rounded-card border border-rule"
               >
-                <ProductVisual
+                <ProductImage
+                  src={line.image ?? productById.get(line.productId)?.images[0]}
+                  alt=""
                   tone={line.imageTone}
-                  categorySlug={categoryByProductId.get(line.productId) ?? 'creams'}
+                  categorySlug={productById.get(line.productId)?.categorySlug ?? 'creams'}
+                  sizes="80px"
+                  className="size-full"
                 />
               </Link>
 

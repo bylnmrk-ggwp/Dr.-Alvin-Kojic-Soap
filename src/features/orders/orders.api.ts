@@ -16,88 +16,41 @@ interface PlaceOrderInput {
 }
 
 /**
- * Orders go to Supabase when it is configured. Without it they are kept in
- * localStorage so the checkout flow can be exercised end to end on a fresh
- * clone — the confirmation page and order history both read from here.
+ * With Supabase configured, orders are created by the `place_order` database
+ * function, which re-prices every line from the catalogue and writes the
+ * order and its items in one transaction. The browser never inserts into the
+ * order tables directly. Without Supabase, orders live in localStorage so the
+ * checkout flow can be exercised end to end on a fresh clone.
  */
 export async function placeOrder(input: PlaceOrderInput): Promise<Order> {
-  const reference = orderReference()
-  const placedAt = new Date().toISOString()
-
-  const order: Order = {
-    id: crypto.randomUUID(),
-    reference,
-    status: 'pending',
-    placedAt,
-    items: input.lines.map((line) => ({
-      productId: line.productId,
-      name: line.name,
-      sizeLabel: line.sizeLabel,
-      unitPriceCentavos: line.unitPriceCentavos,
-      quantity: line.quantity,
-    })),
-    subtotalCentavos: input.subtotalCentavos,
-    shippingCentavos: input.shippingCentavos,
-    totalCentavos: input.totalCentavos,
-    shipTo: input.shipTo,
-    paymentMethod: input.paymentMethod,
-  }
-
   if (!supabase) {
-    const existing = readLocalOrders()
-    writeLocalOrders([order, ...existing])
+    const order = buildLocalOrder(input)
+    writeLocalOrders([order, ...readLocalOrders()])
     return order
   }
 
-  const { data: inserted, error } = await supabase
-    .from('orders')
-    .insert({
-      user_id: input.userId,
-      reference,
-      status: 'pending',
-      subtotal_centavos: input.subtotalCentavos,
-      shipping_centavos: input.shippingCentavos,
-      total_centavos: input.totalCentavos,
-      payment_method: input.paymentMethod,
-      ship_to: input.shipTo as unknown as Json,
-      placed_at: placedAt,
-    })
-    .select('id')
-    .single()
+  const { data, error } = await supabase.rpc('place_order', {
+    p_items: input.lines.map((line) => ({ product_id: line.productId, quantity: line.quantity })),
+    p_ship_to: input.shipTo as unknown as Json,
+    p_payment_method: input.paymentMethod,
+  })
 
-  if (error) throw new Error(`Could not place the order: ${error.message}`)
+  if (error) throw new Error(friendlyOrderError(error.message))
+  const order = mapOrderJson(data)
 
-  const { error: itemsError } = await supabase.from('order_items').insert(
-    order.items.map((item) => ({
-      order_id: inserted.id,
-      product_id: item.productId,
-      name: item.name,
-      size_label: item.sizeLabel,
-      unit_price_centavos: item.unitPriceCentavos,
-      quantity: item.quantity,
-    })),
-  )
+  // Guests get a local copy so the confirmation page can render offline too.
+  if (!input.userId) writeLocalOrders([order, ...readLocalOrders()])
 
-  if (itemsError) throw new Error(`Order saved but items failed: ${itemsError.message}`)
-
-  // Guests get a local copy so the confirmation page can render without a session.
-  if (!input.userId) writeLocalOrders([{ ...order, id: inserted.id }, ...readLocalOrders()])
-
-  return { ...order, id: inserted.id }
+  return order
 }
 
 export async function fetchOrderByReference(reference: string): Promise<Order | null> {
   const local = readLocalOrders().find((order) => order.reference === reference)
   if (!supabase) return local ?? null
 
-  const { data, error } = await supabase
-    .from('orders')
-    .select('*, order_items(*)')
-    .eq('reference', reference)
-    .maybeSingle()
-
+  const { data, error } = await supabase.rpc('get_order_by_reference', { p_reference: reference })
   if (error || !data) return local ?? null
-  return mapOrderRow(data)
+  return mapOrderJson(data)
 }
 
 export async function fetchMyOrders(userId: string | null): Promise<Order[]> {
@@ -111,6 +64,50 @@ export async function fetchMyOrders(userId: string | null): Promise<Order[]> {
 
   if (error) throw new Error(`Could not load your orders: ${error.message}`)
   return data.map(mapOrderRow)
+}
+
+// ------------------------------------------------------------------ mapping
+
+/** Shape returned by place_order and get_order_by_reference. */
+interface OrderJson {
+  id: string
+  reference: string
+  status: OrderStatus
+  placed_at: string
+  subtotal_centavos: number
+  shipping_centavos: number
+  total_centavos: number
+  payment_method: PaymentMethod
+  ship_to: ShippingAddress
+  items: {
+    product_id: string | null
+    name: string
+    size_label: string
+    unit_price_centavos: number
+    quantity: number
+  }[]
+}
+
+function mapOrderJson(json: Json): Order {
+  const row = json as unknown as OrderJson
+  return {
+    id: row.id,
+    reference: row.reference,
+    status: row.status,
+    placedAt: row.placed_at,
+    subtotalCentavos: row.subtotal_centavos,
+    shippingCentavos: row.shipping_centavos,
+    totalCentavos: row.total_centavos,
+    paymentMethod: row.payment_method,
+    shipTo: row.ship_to,
+    items: (row.items ?? []).map((item) => ({
+      productId: item.product_id ?? '',
+      name: item.name,
+      sizeLabel: item.size_label,
+      unitPriceCentavos: item.unit_price_centavos,
+      quantity: item.quantity,
+    })),
+  }
 }
 
 type OrderWithItems = {
@@ -132,7 +129,7 @@ type OrderWithItems = {
   }[]
 }
 
-function mapOrderRow(row: OrderWithItems): Order {
+export function mapOrderRow(row: OrderWithItems): Order {
   return {
     id: row.id,
     reference: row.reference,
@@ -150,6 +147,32 @@ function mapOrderRow(row: OrderWithItems): Order {
       unitPriceCentavos: item.unit_price_centavos,
       quantity: item.quantity,
     })),
+  }
+}
+
+/** Database errors carry the text we raised; strip the Postgres framing. */
+function friendlyOrderError(message: string): string {
+  return message.replace(/^.*?:\s*/, '').trim() || 'Could not place the order. Try again in a moment.'
+}
+
+function buildLocalOrder(input: PlaceOrderInput): Order {
+  return {
+    id: crypto.randomUUID(),
+    reference: orderReference(),
+    status: 'pending',
+    placedAt: new Date().toISOString(),
+    items: input.lines.map((line) => ({
+      productId: line.productId,
+      name: line.name,
+      sizeLabel: line.sizeLabel,
+      unitPriceCentavos: line.unitPriceCentavos,
+      quantity: line.quantity,
+    })),
+    subtotalCentavos: input.subtotalCentavos,
+    shippingCentavos: input.shippingCentavos,
+    totalCentavos: input.totalCentavos,
+    shipTo: input.shipTo,
+    paymentMethod: input.paymentMethod,
   }
 }
 

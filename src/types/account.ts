@@ -1,6 +1,9 @@
+export type ProfileRole = 'customer' | 'admin'
+
 export interface Profile {
   id: string
   email: string
+  role: ProfileRole
   fullName: string
   phone: string | null
   /** Resellers see wholesale pricing cues and their distributor status. */

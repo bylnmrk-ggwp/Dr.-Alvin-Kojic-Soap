@@ -8,6 +8,8 @@ export interface CartLine {
   unitPriceCentavos: number
   quantity: number
   imageTone: string
+  /** Primary photo path. Optional because carts saved before photos existed lack it. */
+  image?: string | null
 }
 
 export interface CartTotals {
@@ -56,5 +58,5 @@ export interface ShippingAddress {
 
 export type ProductLike = Pick<
   Product,
-  'id' | 'slug' | 'name' | 'sizeLabel' | 'priceCentavos' | 'imageTone'
+  'id' | 'slug' | 'name' | 'sizeLabel' | 'priceCentavos' | 'imageTone' | 'images'
 >

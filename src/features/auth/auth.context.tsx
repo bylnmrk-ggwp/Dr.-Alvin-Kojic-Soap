@@ -1,7 +1,7 @@
 import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { isSupabaseConfigured, supabase } from '@/lib/supabase/client'
-import type { Profile } from '@/types'
+import type { Profile, ProfileRole } from '@/types'
 import type { SignInValues, SignUpValues } from '@/lib/validation/schemas'
 
 interface AuthContextValue {
@@ -55,6 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile({
           id: data.id,
           email: data.email,
+          role: (data.role as ProfileRole) ?? 'customer',
           fullName: data.full_name,
           phone: data.phone,
           isDistributor: data.is_distributor,

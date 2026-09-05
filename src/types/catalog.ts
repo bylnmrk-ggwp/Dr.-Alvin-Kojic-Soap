@@ -33,6 +33,11 @@ export interface Product {
   ratingAverage: number
   ratingCount: number
   imageTone: string
+  /** Local paths under /products, first one is the primary photo. Empty means fall back to the drawn vessel. */
+  images: string[]
+  /** Chosen by the admin for the homepage featured section. */
+  isFeatured: boolean
+  featuredOrder: number | null
 }
 
 export interface ProductFilters {

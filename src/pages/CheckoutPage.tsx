@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PageMeta } from '@/components/common/PageMeta'
-import { Button, ButtonLink, EmptyState, Field, ProductVisual, TextArea, TextInput } from '@/components/ui'
+import { Button, ButtonLink, EmptyState, Field, ProductImage, TextArea, TextInput } from '@/components/ui'
 import { checkoutSchema, type CheckoutValues } from '@/lib/validation/schemas'
 import { useCartStore, selectTotals } from '@/stores/cart.store'
 import { usePlaceOrder } from '@/features/orders/orders.queries'
@@ -28,7 +28,7 @@ export default function CheckoutPage() {
   const { user, profile } = useAuth()
   const placeOrder = usePlaceOrder()
 
-  const categoryByProductId = new Map(products.map((product) => [product.id, product.categorySlug]))
+  const productById = new Map(products.map((product) => [product.id, product]))
 
   const form = useForm<CheckoutValues>({
     resolver: zodResolver(checkoutSchema),
@@ -168,8 +168,15 @@ export default function CheckoutPage() {
               <ul className="mt-5 divide-y divide-rule">
                 {lines.map((line) => (
                   <li key={line.productId} className="flex gap-4 py-4">
-                    <div className="size-16 shrink-0 overflow-hidden">
-                      <ProductVisual tone={line.imageTone} categorySlug={categoryByProductId.get(line.productId) ?? 'creams'} />
+                    <div className="size-16 shrink-0 overflow-hidden rounded-card border border-rule">
+                      <ProductImage
+                        src={line.image ?? productById.get(line.productId)?.images[0]}
+                        alt=""
+                        tone={line.imageTone}
+                        categorySlug={productById.get(line.productId)?.categorySlug ?? 'creams'}
+                        sizes="64px"
+                        className="size-full"
+                      />
                     </div>
                     <div className="flex min-w-0 flex-1 flex-col justify-between">
                       <div>
